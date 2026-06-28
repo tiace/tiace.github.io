@@ -29,8 +29,38 @@ jobs:
         run: |
           find out -mindepth 1 -maxdepth 1 | while read -r item; do
             name=$(basename "$item")
+            case "$name" in
+              __next.*) continue ;;
+            esac
             rm -rf "$name"
             cp -r "$item" "./$name"
+          done
+
+      - name: Rename Jekyll-incompatible paths
+        run: |
+          if [ -d _next ]; then
+            rm -rf assets
+            mv _next assets
+          fi
+          if [ -d _not-found ]; then
+            rm -rf not-found
+            mv _not-found not-found
+          fi
+
+      - name: Rewrite asset paths in deployed files
+        run: |
+          rewrite() {
+            find "$1" -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' \) \
+              -exec sed -i 's|/_next/|/assets/|g; s|/_not-found/|/not-found/|g' {} +
+          }
+          for target in index.html 404.html assets not-found 404; do
+            if [ -e "$target" ]; then
+              if [ -f "$target" ]; then
+                sed -i 's|/_next/|/assets/|g; s|/_not-found/|/not-found/|g' "$target"
+              else
+                rewrite "$target"
+              fi
+            fi
           done
           touch .nojekyll
 
@@ -39,9 +69,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          git rm -rf --cached _next _not-found 2>/dev/null || true
+
           git add -f .nojekyll
-          find out -mindepth 1 -maxdepth 1 -exec basename {} \; | while read -r name; do
-            git add -f "$name"
+          for path in index.html 404.html assets not-found 404 favicon.ico favicon.svg apple-touch-icon.png icon.svg web-app-manifest-192x192.png web-app-manifest-512x512.png; do
+            if [ -e "$path" ]; then
+              git add -f "$path"
+            fi
           done
 
           if git diff --staged --quiet; then
