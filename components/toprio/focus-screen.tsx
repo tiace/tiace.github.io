@@ -29,7 +29,7 @@ export function FocusScreen({ task, onFinish, onCapture }: FocusScreenProps) {
     if (!trimmed) return
     onCapture(trimmed)
     setNote("")
-    toast.success("I'll remind you later.")
+    toast.success(`I'll remind you later: "${trimmed}"`)
   }
 
   return (
