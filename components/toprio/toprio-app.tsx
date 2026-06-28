@@ -59,7 +59,13 @@ export function ToprioApp() {
   }
 
   if (screen === "focus" && state.current) {
-    return <FocusScreen task={state.current} onFinish={handleFinish} />
+    return (
+      <FocusScreen
+        task={state.current}
+        onFinish={handleFinish}
+        onCapture={addTodo}
+      />
+    )
   }
 
   if (screen === "finished") {

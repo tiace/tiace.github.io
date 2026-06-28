@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from "react"
 import { Check } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { type CurrentTask, formatDuration } from "@/lib/toprio"
 
 type FocusScreenProps = {
   task: CurrentTask
   onFinish: () => void
+  onCapture: (note: string) => void
 }
 
-export function FocusScreen({ task, onFinish }: FocusScreenProps) {
+export function FocusScreen({ task, onFinish, onCapture }: FocusScreenProps) {
   const [now, setNow] = useState(() => Date.now())
+  const [note, setNote] = useState("")
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000)
@@ -19,6 +22,15 @@ export function FocusScreen({ task, onFinish }: FocusScreenProps) {
   }, [])
 
   const elapsed = Math.max(0, now - task.startedAt)
+
+  function handleCapture(event: React.FormEvent) {
+    event.preventDefault()
+    const trimmed = note.trim()
+    if (!trimmed) return
+    onCapture(trimmed)
+    setNote("")
+    toast.success("I'll remind you later.")
+  }
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-12 px-6 py-16">
@@ -48,6 +60,16 @@ export function FocusScreen({ task, onFinish }: FocusScreenProps) {
         <Check className="size-5" aria-hidden="true" />
         Finished
       </Button>
+
+      <form onSubmit={handleCapture} className="w-full max-w-md">
+        <input
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Need to remember something?"
+          aria-label="Capture a thought to remember later"
+          className="w-full rounded-2xl border border-border bg-card/60 px-5 py-3 text-center text-sm text-card-foreground shadow-sm outline-none transition placeholder:text-muted-foreground focus:border-ring focus:bg-card focus:ring-2 focus:ring-ring/40"
+        />
+      </form>
     </div>
   )
 }
