@@ -1,0 +1,16 @@
+{
+  "nodeModulesDir": "auto",
+  "unstable": [
+    "bare-node-builtins",
+    "detect-cjs",
+    "node-globals",
+    "unsafe-proto",
+    "sloppy-imports"
+  ],
+  "tasks": {
+    "dev": "deno run -A npm:next dev -p 3001",
+    "build": "deno run -A npm:next build",
+    "start": "deno run -A npm:next start -p 3001",
+    "install": "deno install --allow-scripts"
+  }
+}

@@ -10,19 +10,56 @@ This repository is linked to a [v0](https://v0.app) project. You can continue de
 
 ## Getting Started
 
-First, run the development server:
+This project runs on [Deno](https://deno.com) with [Next.js](https://nextjs.org).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+### Prerequisites
+
+- [Deno 2.x](https://docs.deno.com/runtime/getting_started/installation/) (recommended)
+
+If `deno` is not recognized, install Deno and ensure `%USERPROFILE%\.deno\bin` is on your PATH:
+
+```powershell
+irm https://deno.land/install.ps1 | iex
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+After installation, **fully restart Cursor** (not just the terminal tab). Cursor keeps the PATH from when it was launched, so a new terminal alone may still not find `deno`.
+
+This repo also configures `.vscode/settings.json` to prepend Deno to PATH in integrated terminals. If `deno` is still not found, use the helper scripts below.
+
+### Install dependencies
+
+```bash
+deno install --allow-scripts
+```
+
+Or on Windows when `deno` is not on PATH:
+
+```powershell
+.\scripts\install.ps1
+```
+
+### Run the development server
+
+```bash
+deno task dev
+```
+
+Or on Windows when `deno` is not on PATH:
+
+```powershell
+.\scripts\dev.ps1
+```
+
+Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+### Other commands
+
+```bash
+deno task build   # production build
+deno task start   # run production server (after build)
+```
 
 ## Learn More
 
