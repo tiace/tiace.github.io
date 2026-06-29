@@ -22,6 +22,9 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Clean build directories
+        run: rm -rf .next out
+
       - run: deno install --allow-scripts
       - run: deno task build
 
@@ -69,12 +72,17 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git rm -rf --cached _next _not-found 2>/dev/null || true
+          # Drop stale build artifacts so old chunk files are not left behind.
+          git rm -rf --cached out _next _not-found assets 2>/dev/null || true
+          git rm -rf --cached \
+            __next.__PAGE__.txt __next._full.txt __next._head.txt __next._index.txt __next._tree.txt \
+            index.txt 2>/dev/null || true
+          rm -rf out _next _not-found
 
           git add -f .nojekyll
           for path in index.html 404.html assets not-found 404 favicon.ico favicon.svg apple-touch-icon.png icon.svg web-app-manifest-192x192.png web-app-manifest-512x512.png; do
             if [ -e "$path" ]; then
-              git add -f "$path"
+              git add -f -A "$path"
             fi
           done
 

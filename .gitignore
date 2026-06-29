@@ -13,9 +13,12 @@ __v0_jsx-dev-runtime.ts
 node_modules
 .next/
 out/
+__next.*
+_not-found/
 /assets/
 /not-found/
 /index.html
+/index.txt
 /404.html
 /404/
 .DS_Store
