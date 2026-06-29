@@ -2,6 +2,9 @@
   "version": "5",
   "specifiers": {
     "npm:@base-ui/react@^1.5.0": "1.6.0_@types+react@19.2.17_react@19.2.7_react-dom@19.2.7__react@19.2.7",
+    "npm:@dnd-kit/core@^6.3.1": "6.3.1_react@19.2.7_react-dom@19.2.7__react@19.2.7",
+    "npm:@dnd-kit/sortable@10": "10.0.0_@dnd-kit+core@6.3.1__react@19.2.7__react-dom@19.2.7___react@19.2.7_react@19.2.7_react-dom@19.2.7__react@19.2.7",
+    "npm:@dnd-kit/utilities@^3.2.2": "3.2.2_react@19.2.7",
     "npm:@tailwindcss/postcss@^4.2.0": "4.3.1",
     "npm:@types/node@24": "24.13.2",
     "npm:@types/react-dom@19": "19.2.3_@types+react@19.2.17",
@@ -273,6 +276,39 @@
       ],
       "optionalPeers": [
         "@types/react"
+      ]
+    },
+    "@dnd-kit/accessibility@3.1.1_react@19.2.7": {
+      "integrity": "sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw==",
+      "dependencies": [
+        "react",
+        "tslib"
+      ]
+    },
+    "@dnd-kit/core@6.3.1_react@19.2.7_react-dom@19.2.7__react@19.2.7": {
+      "integrity": "sha512-xkGBRQQab4RLwgXxoqETICr6S5JlogafbhNsidmrkVv2YRs5MLwpjoF2qpiGjQt8S9AoxtIV603s0GIUpY5eYQ==",
+      "dependencies": [
+        "@dnd-kit/accessibility",
+        "@dnd-kit/utilities",
+        "react",
+        "react-dom",
+        "tslib"
+      ]
+    },
+    "@dnd-kit/sortable@10.0.0_@dnd-kit+core@6.3.1__react@19.2.7__react-dom@19.2.7___react@19.2.7_react@19.2.7_react-dom@19.2.7__react@19.2.7": {
+      "integrity": "sha512-+xqhmIIzvAYMGfBYYnbKuNicfSsk4RksY2XdmJhT+HAC01nix6fHCztU68jooFiMUB01Ky3F0FyOvhG/BZrWkg==",
+      "dependencies": [
+        "@dnd-kit/core",
+        "@dnd-kit/utilities",
+        "react",
+        "tslib"
+      ]
+    },
+    "@dnd-kit/utilities@3.2.2_react@19.2.7": {
+      "integrity": "sha512-+MKAJEOfaBe5SmV6t34p80MMKhjvUz0vRrvVJbPT0WElzaOJ/1xs+D+KDv+tD/NE5ujfrChEcshd4fLn0wpiqg==",
+      "dependencies": [
+        "react",
+        "tslib"
       ]
     },
     "@dotenvx/dotenvx@1.75.1": {
@@ -2348,6 +2384,9 @@
     "packageJson": {
       "dependencies": [
         "npm:@base-ui/react@^1.5.0",
+        "npm:@dnd-kit/core@^6.3.1",
+        "npm:@dnd-kit/sortable@10",
+        "npm:@dnd-kit/utilities@^3.2.2",
         "npm:@tailwindcss/postcss@^4.2.0",
         "npm:@types/node@24",
         "npm:@types/react-dom@19",

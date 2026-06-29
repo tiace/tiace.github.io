@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Toprio",
+  "version": "1.0.0",
+  "description": "現在のアクティブタスクをGoogle検索結果に表示する",
+  "permissions": ["storage"],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://tiace.github.io/*"],
+      "js": ["content-toprio.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.google.com/*", "https://www.google.co.jp/*"],
+      "js": ["content-google.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

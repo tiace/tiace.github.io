@@ -1,7 +1,21 @@
 "use client"
 
 import { type FormEvent, useState } from "react"
-import { ArrowLeft, ChevronDown, ChevronUp, Clock, Plus, Trash2 } from "lucide-react"
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { ArrowLeft, Clock, GripVertical, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Todo } from "@/lib/toprio"
 
@@ -10,19 +24,110 @@ type TodoManagerProps = {
   onAdd: (name: string) => void
   onRemove: (id: string) => void
   onMove: (id: string, direction: "up" | "down") => void
+  onReorder: (fromIndex: number, toIndex: number) => void
+  onRename: (id: string, name: string) => void
   onBack: () => void
   onHistory: () => void
+}
+
+type SortableTodoItemProps = {
+  todo: Todo
+  index: number
+  onRemove: (id: string) => void
+  onRename: (id: string, name: string) => void
+}
+
+function SortableTodoItem({ todo, index, onRemove, onRename }: SortableTodoItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: todo.id })
+  const [editing, setEditing] = useState(false)
+  const [editValue, setEditValue] = useState(todo.name)
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  }
+
+  function commitEdit() {
+    const trimmed = editValue.trim()
+    if (trimmed && trimmed !== todo.name) onRename(todo.id, trimmed)
+    else setEditValue(todo.name)
+    setEditing(false)
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") commitEdit()
+    if (e.key === "Escape") {
+      setEditValue(todo.name)
+      setEditing(false)
+    }
+  }
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3"
+    >
+      <div
+        {...attributes}
+        {...listeners}
+        className="flex cursor-grab touch-none items-center gap-3 active:cursor-grabbing"
+        aria-label={`${todo.name}をドラッグして並び替え`}
+      >
+        <GripVertical className="size-4 shrink-0 text-muted-foreground/40" aria-hidden="true" />
+        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
+          {index + 1}
+        </span>
+      </div>
+      {editing ? (
+        <input
+          autoFocus
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onBlur={commitEdit}
+          onKeyDown={handleKeyDown}
+          className="flex-1 bg-transparent text-card-foreground outline-none"
+        />
+      ) : (
+        <span
+          className="flex-1 cursor-text truncate text-card-foreground"
+          onClick={() => setEditing(true)}
+        >
+          {todo.name}
+        </span>
+      )}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="size-8 shrink-0 rounded-lg text-muted-foreground hover:text-destructive"
+        onClick={() => onRemove(todo.id)}
+        aria-label={`${todo.name}を削除`}
+      >
+        <Trash2 className="size-4" aria-hidden="true" />
+      </Button>
+    </li>
+  )
 }
 
 export function TodoManager({
   todos,
   onAdd,
   onRemove,
-  onMove,
+  onReorder,
+  onRename,
   onBack,
   onHistory,
 }: TodoManagerProps) {
   const [value, setValue] = useState("")
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    })
+  )
 
   function handleAdd(event: FormEvent) {
     event.preventDefault()
@@ -30,6 +135,16 @@ export function TodoManager({
     if (!trimmed) return
     onAdd(trimmed)
     setValue("")
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const fromIndex = todos.findIndex((t) => t.id === active.id)
+    const toIndex = todos.findIndex((t) => t.id === over.id)
+    if (fromIndex !== -1 && toIndex !== -1) {
+      onReorder(fromIndex, toIndex)
+    }
   }
 
   return (
@@ -71,52 +186,25 @@ export function TodoManager({
           No upcoming tasks yet. Add one above.
         </p>
       ) : (
-        <ul className="flex flex-col gap-2">
-          {todos.map((todo, index) => (
-            <li
-              key={todo.id}
-              className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3"
-            >
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
-                {index + 1}
-              </span>
-              <span className="flex-1 truncate text-card-foreground">
-                {todo.name}
-              </span>
-              <div className="flex items-center gap-0.5">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 rounded-lg"
-                  disabled={index === 0}
-                  onClick={() => onMove(todo.id, "up")}
-                  aria-label={`Move ${todo.name} up`}
-                >
-                  <ChevronUp className="size-4" aria-hidden="true" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 rounded-lg"
-                  disabled={index === todos.length - 1}
-                  onClick={() => onMove(todo.id, "down")}
-                  aria-label={`Move ${todo.name} down`}
-                >
-                  <ChevronDown className="size-4" aria-hidden="true" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 rounded-lg text-muted-foreground hover:text-destructive"
-                  onClick={() => onRemove(todo.id)}
-                  aria-label={`Delete ${todo.name}`}
-                >
-                  <Trash2 className="size-4" aria-hidden="true" />
-                </Button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={todos.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+            <ul className="flex flex-col gap-2">
+              {todos.map((todo, index) => (
+                <SortableTodoItem
+                  key={todo.id}
+                  todo={todo}
+                  index={index}
+                  onRemove={onRemove}
+                  onRename={onRename}
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   )

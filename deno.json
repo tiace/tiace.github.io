@@ -12,5 +12,9 @@
     "build": "deno run -A npm:next build",
     "start": "deno run -A npm:next start -p 3001",
     "install": "deno install --allow-scripts"
+  },
+  "allowScripts": {
+    "allow": [],
+    "deny": ["npm:sharp@0.34.5"]
   }
 }

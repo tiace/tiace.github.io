@@ -92,6 +92,22 @@ export function useToprio() {
     })
   }, [])
 
+  const renameTodo = useCallback((id: string, name: string) => {
+    setState((s) => ({
+      ...s,
+      todos: s.todos.map((t) => (t.id === id ? { ...t, name } : t)),
+    }))
+  }, [])
+
+  const reorderTodos = useCallback((fromIndex: number, toIndex: number) => {
+    setState((s) => {
+      const todos = [...s.todos]
+      const [moved] = todos.splice(fromIndex, 1)
+      todos.splice(toIndex, 0, moved)
+      return { ...s, todos }
+    })
+  }, [])
+
   return {
     state,
     hydrated,
@@ -101,5 +117,7 @@ export function useToprio() {
     addTodo,
     removeTodo,
     moveTodo,
+    renameTodo,
+    reorderTodos,
   }
 }

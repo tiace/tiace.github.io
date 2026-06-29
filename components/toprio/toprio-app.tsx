@@ -20,6 +20,8 @@ export function ToprioApp() {
     addTodo,
     removeTodo,
     moveTodo,
+    renameTodo,
+    reorderTodos,
   } = useToprio()
 
   const [screen, setScreen] = useState<Screen>("start")
@@ -32,6 +34,10 @@ export function ToprioApp() {
     setScreen(state.current ? "focus" : "start")
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated])
+
+  useEffect(() => {
+    document.title = state.current ? `${state.current.name} - Toprio` : "Toprio"
+  }, [state.current])
 
   function handleStartTask(name: string) {
     startTask(name)
@@ -87,6 +93,8 @@ export function ToprioApp() {
         onAdd={addTodo}
         onRemove={removeTodo}
         onMove={moveTodo}
+        onReorder={reorderTodos}
+        onRename={renameTodo}
         onBack={() => setScreen("finished")}
         onHistory={() => openHistory("manage")}
       />
