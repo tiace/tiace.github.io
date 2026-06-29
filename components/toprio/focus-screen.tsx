@@ -35,7 +35,7 @@ export function FocusScreen({ task, onFinish, onCapture }: FocusScreenProps) {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-12 px-6 py-16">
       <div
-        className="flex w-full max-w-3xl flex-col items-center gap-6 rounded-[2rem] bg-sticky px-8 py-16 text-center shadow-lg sm:px-16 sm:py-20"
+        className="flex w-full max-w-lg flex-col items-center gap-6 rounded-[2rem] bg-sticky px-8 py-12 text-center shadow-lg sm:px-16 sm:py-16"
         style={{ rotate: "-1deg" }}
       >
         <span className="text-xs font-medium uppercase tracking-[0.3em] text-sticky-foreground/70">
