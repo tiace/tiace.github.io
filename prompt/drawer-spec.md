@@ -66,12 +66,6 @@ Toprio に合わせた選択:
 - アイコン: `Menu`（ハンバーガー）→ 開いているときは `X`
 - ホバー: `bg-muted/80`、わずかに拡大（`scale-105`）
 
-### バッジ（コンテキスト表示）
-
-To-doが1件以上ある場合、ボタン右上に小さいバッジを表示:
-- サイズ: 16×16px の赤丸、最大99+
-- focus画面中は「実行中」を示すパルスアニメーション（`animate-pulse`の緑ドット）でも可
-
 ---
 
 ## ドロワーパネル
@@ -106,9 +100,10 @@ To-doが1件以上ある場合、ボタン右上に小さいバッジを表示:
 
 ### アニメーション
 
-- 開く: 右から左へスライドイン（`translateX(100%) → translateX(0)`、200ms ease-out）
-- 閉じる: 左から右へスライドアウト（150ms ease-in）
-- バックドロップ: `bg-black/30` でフェードイン
+`tw-animate-css` のクラスを使用:
+- 開く: `animate-slide-in-from-right`（または相当するクラス）
+- 閉じる: `animate-slide-out-to-right`
+- バックドロップ: `animate-fade-in` / `animate-fade-out`（`bg-black/30`）
 - ドロワー外クリックで閉じる
 
 ---
@@ -149,10 +144,10 @@ Toprio                          [X]
 ```
 アイテム一覧（スクリーン対応）:
 
-  🏠  Start         → start スクリーン
-  ▶  Focus          → focus スクリーン（タスク実行中のみ表示）
-  ✓  To-dos    [3]  → manage スクリーン（件数バッジ）
-  🕐  History       → history スクリーン（historyOrigin を "drawer" に）
+  🏠  Start     → start スクリーン
+  ▶  Focus      → focus スクリーン（タスク実行中のみ表示）
+  ✓  To-dos     → manage スクリーン
+  🕐  History   → history スクリーン
 ```
 
 アイコン（lucide-react）:
@@ -193,7 +188,9 @@ Toprio                          [X]
 
 特殊ケース:
 - **Focus**タップ: `state.current` がない場合は無効化（グレーアウト）またはStartへ
-- **History**タップ: `historyOrigin` は `"drawer"` とし、Backボタンは元のスクリーンに戻るように
+- **History**タップ: ドロワーを開いた時点のスクリーンを `historyOrigin` に保存する。Backボタンの戻り先は以下のルール:
+  - `state.current` が存在する（タスク実行中）→ focus スクリーン
+  - `state.current` が null（タスク完了済み）→ finished スクリーン
 - **現在地と同じスクリーン**タップ: ドロワーを閉じるだけ（遷移なし）
 
 ---
@@ -212,7 +209,7 @@ Toprio                          [X]
 
 ```
 components/toprio/
-  drawer-button.tsx   ← フローティングトリガーボタン（バッジ含む）
+  drawer-button.tsx   ← フローティングトリガーボタン
   app-drawer.tsx      ← ドロワーパネル本体
 ```
 
@@ -237,9 +234,6 @@ components/toprio/
 
 ---
 
-## 未決事項（実装前に確認）
+## 実装後に確認
 
-1. **ドロワーボタンの位置**: 右下固定でよいか？左下の方がThings 3的で自然か？
-2. **Focus 画面でのボタン視認性**: 付箋UIの上にかぶらないか（`bottom: 1.5rem` で問題ないか確認）
-3. **historyOrigin の扱い**: ドロワー経由のHistoryからBackしたとき、元スクリーンが `finished` / `manage` / `focus` のどこに戻すか
-4. **アニメーション実装**: `tw-animate-css` のクラスを使うか、CSS Transitionで自前実装か
+- **Focus 画面でのボタン視認性**: 付箋UIの上にかぶらないか（`bottom: 1.5rem` で問題ないか目視確認）
