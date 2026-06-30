@@ -28,10 +28,16 @@ export function ToprioApp() {
   const [screen, setScreen] = useState<Screen>("start")
   const [historyOrigin, setHistoryOrigin] = useState<Screen>("finished")
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [finishedVariant, setFinishedVariant] = useState<"finished" | "ready">("finished")
 
   useEffect(() => {
     if (!hydrated) return
-    setScreen(state.current ? "focus" : "start")
+    if (state.current) {
+      setScreen("focus")
+    } else if (state.todos.length > 0) {
+      setFinishedVariant("ready")
+      setScreen("finished")
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated])
 
@@ -51,6 +57,7 @@ export function ToprioApp() {
 
   function handleFinish() {
     finishCurrent()
+    setFinishedVariant("finished")
     setScreen("finished")
   }
 
@@ -94,6 +101,7 @@ export function ToprioApp() {
           onStartNew={handleStartTask}
           onManage={() => setScreen("manage")}
           onHistory={() => openHistory("finished")}
+          variant={finishedVariant}
         />
       )
     }
