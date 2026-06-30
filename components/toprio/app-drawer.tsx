@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Clock, ListChecks, Play, Sparkles, X } from "lucide-react"
+import { Clock, ListChecks, Play, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { type CurrentTask, type Screen, formatDuration } from "@/lib/toprio"
 
@@ -52,7 +52,6 @@ export function AppDrawer({ open, screen, current, onClose, onNavigate }: AppDra
   }, [open, onClose])
 
   const navItems: NavItem[] = [
-    { screen: "start", label: "Start", icon: <Sparkles className="size-4" aria-hidden="true" /> },
     {
       screen: "focus",
       label: "Focus",

@@ -115,7 +115,7 @@ export function ToprioApp() {
           onMove={moveTodo}
           onReorder={reorderTodos}
           onRename={renameTodo}
-          onBack={() => setScreen("finished")}
+          onBack={() => setScreen(state.current ? "focus" : "finished")}
           onHistory={() => openHistory("manage")}
         />
       )
