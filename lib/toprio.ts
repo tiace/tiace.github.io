@@ -1,3 +1,5 @@
+export type Screen = "start" | "focus" | "finished" | "manage" | "history"
+
 export type Todo = {
   id: string
   name: string
