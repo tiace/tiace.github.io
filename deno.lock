@@ -15,6 +15,7 @@
     "npm:lucide-react@^1.16.0": "1.21.0_react@19.2.7",
     "npm:next@*": "16.2.6_react@19.2.7_react-dom@19.2.7__react@19.2.7",
     "npm:next@16.2.6": "16.2.6_react@19.2.7_react-dom@19.2.7__react@19.2.7",
+    "npm:playwright@^1.61.1": "1.61.1",
     "npm:postcss@^8.5.0": "8.5.15",
     "npm:react-dom@19": "19.2.7_react@19.2.7",
     "npm:react@19": "19.2.7",
@@ -1289,6 +1290,11 @@
         "universalify"
       ]
     },
+    "fsevents@2.3.2": {
+      "integrity": "sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==",
+      "os": ["darwin"],
+      "scripts": true
+    },
     "function-bind@1.1.2": {
       "integrity": "sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA=="
     },
@@ -1878,6 +1884,20 @@
         "find-up"
       ]
     },
+    "playwright-core@1.61.1": {
+      "integrity": "sha512-h7Qlt6m4REp25qvIdvbDtVmD4LqVXfpRxhORv9L0jzETM05p4fuPJ3dKyuSXQxDSbXnmS79HAgi9589lGSpLkg==",
+      "bin": true
+    },
+    "playwright@1.61.1": {
+      "integrity": "sha512-DWnY5o3YbLWK4GovuAVwpqL+1VwGNdUGrRr++8j8PtQQzvAVZUIMjKQ90fY689sEJZJBbZVw1rXaOKSTitkzPQ==",
+      "dependencies": [
+        "playwright-core"
+      ],
+      "optionalDependencies": [
+        "fsevents"
+      ],
+      "bin": true
+    },
     "postcss-selector-parser@7.1.4": {
       "integrity": "sha512-HeP7D2wyhkR+XaK6v4W8oRF62Dsz4flyuczALJp61GckGm42u1saSSJ/0auvcBqxs3jMRFEcPK34At/0JBKdOg==",
       "dependencies": [
@@ -2396,6 +2416,7 @@
         "npm:clsx@^2.1.1",
         "npm:lucide-react@^1.16.0",
         "npm:next@16.2.6",
+        "npm:playwright@^1.61.1",
         "npm:postcss@^8.5.0",
         "npm:react-dom@19",
         "npm:react@19",
