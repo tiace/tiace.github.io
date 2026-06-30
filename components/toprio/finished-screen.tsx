@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, Clock, ListChecks, PartyPopper } from "lucide-react"
+import { ArrowRight, Clock, ListChecks, PartyPopper, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TaskInput } from "@/components/toprio/task-input"
 import type { Todo } from "@/lib/toprio"
@@ -11,6 +11,7 @@ type FinishedScreenProps = {
   onStartNew: (name: string) => void
   onManage: () => void
   onHistory: () => void
+  variant?: "finished" | "ready"
 }
 
 export function FinishedScreen({
@@ -19,20 +20,30 @@ export function FinishedScreen({
   onStartNew,
   onManage,
   onHistory,
+  variant = "finished",
 }: FinishedScreenProps) {
   const next = todos[0]
+  const isReady = variant === "ready"
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-10 px-6 py-16">
       <header className="flex flex-col items-center gap-3 text-center">
         <span className="flex size-12 items-center justify-center rounded-full bg-sticky text-sticky-foreground">
-          <PartyPopper className="size-6" aria-hidden="true" />
+          {isReady
+            ? <Play className="size-6" aria-hidden="true" />
+            : <PartyPopper className="size-6" aria-hidden="true" />
+          }
         </span>
         <h1 className="text-balance text-2xl font-semibold text-foreground sm:text-3xl">
-          Task complete
+          {isReady ? "What's next?" : "Task complete"}
         </h1>
         <p className="text-muted-foreground">
-          {next ? "Here's what's next." : "What would you like to do next?"}
+          {next
+            ? "Here's what's next."
+            : isReady
+              ? "What would you like to do?"
+              : "What would you like to do next?"
+          }
         </p>
       </header>
 

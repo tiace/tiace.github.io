@@ -25,13 +25,18 @@ export function ToprioApp() {
   } = useToprio()
 
   const [screen, setScreen] = useState<Screen>("start")
-  // Where to return to when leaving the history view.
   const [historyOrigin, setHistoryOrigin] = useState<Screen>("finished")
+  const [finishedVariant, setFinishedVariant] = useState<"finished" | "ready">("finished")
 
   // On first hydration, resume an in-progress task if one exists.
   useEffect(() => {
     if (!hydrated) return
-    setScreen(state.current ? "focus" : "start")
+    if (state.current) {
+      setScreen("focus")
+    } else if (state.todos.length > 0) {
+      setFinishedVariant("ready")
+      setScreen("finished")
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated])
 
@@ -51,6 +56,7 @@ export function ToprioApp() {
 
   function handleFinish() {
     finishCurrent()
+    setFinishedVariant("finished")
     setScreen("finished")
   }
 
@@ -82,6 +88,7 @@ export function ToprioApp() {
         onStartNew={handleStartTask}
         onManage={() => setScreen("manage")}
         onHistory={() => openHistory("finished")}
+        variant={finishedVariant}
       />
     )
   }
