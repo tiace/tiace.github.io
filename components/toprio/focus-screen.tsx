@@ -82,11 +82,11 @@ export function FocusScreen({
             onChange={(e) => setEditValue(e.target.value)}
             onBlur={commitEdit}
             onKeyDown={handleEditKeyDown}
-            className="w-full bg-transparent text-center text-3xl font-semibold leading-tight text-sticky-foreground outline-none sm:text-5xl"
+            className="w-full break-words bg-transparent text-center text-3xl font-semibold leading-tight text-sticky-foreground outline-none sm:text-5xl"
           />
         ) : (
           <h1
-            className="text-balance text-3xl font-semibold leading-tight text-sticky-foreground sm:text-5xl cursor-text"
+            className="w-full break-words text-center text-3xl font-semibold leading-tight text-sticky-foreground sm:text-5xl cursor-text"
             onClick={startEditing}
           >
             {task.name}

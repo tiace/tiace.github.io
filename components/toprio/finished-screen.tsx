@@ -88,11 +88,11 @@ export function FinishedScreen({
                 onChange={(e) => setEditValue(e.target.value)}
                 onBlur={commitEdit}
                 onKeyDown={handleEditKeyDown}
-                className="bg-transparent text-center text-lg font-medium text-card-foreground outline-none"
+                className="w-full break-words bg-transparent text-center text-lg font-medium text-card-foreground outline-none"
               />
             ) : (
               <span
-                className="cursor-text text-lg font-medium text-card-foreground"
+                className="cursor-text break-words text-lg font-medium text-card-foreground"
                 onClick={startEditing}
               >
                 {next.name}
