@@ -2,4 +2,4 @@
 2:I[59574,["/_next/static/chunks/0oy9jq9lsd.5p.js","/_next/static/chunks/16iwt.lig4mp9.js"],"default"]
 3:I[47294,["/_next/static/chunks/0oy9jq9lsd.5p.js","/_next/static/chunks/16iwt.lig4mp9.js"],"default"]
 4:[]
-0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"isPartial":false,"staleTime":300,"varyParams":"$W4","buildId":"0MhM2dcmtU4AqwI5I7RTB"}
+0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"isPartial":false,"staleTime":300,"varyParams":"$W4","buildId":"iMivNhXOrKnJInT9OkwGF"}
