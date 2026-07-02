@@ -10,8 +10,19 @@ import { TodoManager } from "@/components/toprio/todo-manager"
 import { HistoryScreen } from "@/components/toprio/history-screen"
 import { DrawerButton } from "@/components/toprio/drawer-button"
 import { AppDrawer } from "@/components/toprio/app-drawer"
+import { openSmallWindow } from "@/lib/small-window"
 
-export function ToprioApp() {
+type ToprioAppProps = {
+  initialScreen?: Screen
+  initialHistoryOrigin?: Screen
+  initialFinishedVariant?: "finished" | "ready"
+}
+
+export function ToprioApp({
+  initialScreen,
+  initialHistoryOrigin,
+  initialFinishedVariant,
+}: ToprioAppProps = {}) {
   const {
     state,
     hydrated,
@@ -25,13 +36,15 @@ export function ToprioApp() {
     reorderTodos,
   } = useToprio()
 
-  const [screen, setScreen] = useState<Screen>("start")
-  const [historyOrigin, setHistoryOrigin] = useState<Screen>("finished")
+  const [screen, setScreen] = useState<Screen>(initialScreen ?? "start")
+  const [historyOrigin, setHistoryOrigin] = useState<Screen>(initialHistoryOrigin ?? "finished")
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [finishedVariant, setFinishedVariant] = useState<"finished" | "ready">("finished")
+  const [finishedVariant, setFinishedVariant] = useState<"finished" | "ready">(
+    initialFinishedVariant ?? "finished",
+  )
 
   useEffect(() => {
-    if (!hydrated) return
+    if (!hydrated || initialScreen) return
     if (state.current) {
       setScreen("focus")
     } else if (state.todos.length > 0) {
@@ -133,6 +146,11 @@ export function ToprioApp() {
     return <StartScreen onStart={handleStartTask} />
   }
 
+  function handleOpenSmallWindow() {
+    openSmallWindow({ screen, historyOrigin, finishedVariant })
+    setDrawerOpen(false)
+  }
+
   return (
     <>
       {renderScreen()}
@@ -143,6 +161,7 @@ export function ToprioApp() {
         current={state.current}
         onClose={() => setDrawerOpen(false)}
         onNavigate={handleDrawerNavigate}
+        onOpenSmallWindow={handleOpenSmallWindow}
       />
     </>
   )

@@ -9,6 +9,7 @@ import {
   emptyState,
   loadState,
   saveState,
+  STORAGE_KEY,
 } from "@/lib/toprio"
 
 export function useToprio() {
@@ -23,6 +24,25 @@ export function useToprio() {
   useEffect(() => {
     if (hydrated) saveState(state)
   }, [state, hydrated])
+
+  useEffect(() => {
+    if (!hydrated) return
+    function onStorage(e: StorageEvent) {
+      if (e.key !== STORAGE_KEY || !e.newValue) return
+      try {
+        const parsed = JSON.parse(e.newValue) as Partial<ToprioState>
+        setState({
+          current: parsed.current ?? null,
+          todos: Array.isArray(parsed.todos) ? parsed.todos : [],
+          history: Array.isArray(parsed.history) ? parsed.history : [],
+        })
+      } catch {
+        // ignore parse errors
+      }
+    }
+    window.addEventListener("storage", onStorage)
+    return () => window.removeEventListener("storage", onStorage)
+  }, [hydrated])
 
   // Begin working on a brand new task (from start / next-input screen).
   const startTask = useCallback((name: string) => {

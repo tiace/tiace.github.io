@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Clock, ListChecks, Play, X } from "lucide-react"
+import { AppWindow, Clock, ListChecks, Play, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useIsDesktop } from "@/hooks/use-is-desktop"
 import { type CurrentTask, type Screen, formatDuration } from "@/lib/toprio"
 
 type AppDrawerProps = {
@@ -11,6 +12,7 @@ type AppDrawerProps = {
   current: CurrentTask | null
   onClose: () => void
   onNavigate: (screen: Screen) => void
+  onOpenSmallWindow: () => void
 }
 
 type NavItem = {
@@ -41,7 +43,15 @@ function CurrentTaskCard({ task }: { task: CurrentTask }) {
   )
 }
 
-export function AppDrawer({ open, screen, current, onClose, onNavigate }: AppDrawerProps) {
+export function AppDrawer({
+  open,
+  screen,
+  current,
+  onClose,
+  onNavigate,
+  onOpenSmallWindow,
+}: AppDrawerProps) {
+  const isDesktop = useIsDesktop()
   useEffect(() => {
     if (!open) return
     function onKeyDown(e: KeyboardEvent) {
@@ -127,6 +137,18 @@ export function AppDrawer({ open, screen, current, onClose, onNavigate }: AppDra
               ))}
             </ul>
           </nav>
+
+          {isDesktop && (
+            <div className="mt-2 border-t border-border pt-4">
+              <button
+                onClick={onOpenSmallWindow}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <AppWindow className="size-4" aria-hidden="true" />
+                Small Window
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
