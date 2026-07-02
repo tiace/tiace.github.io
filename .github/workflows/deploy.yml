@@ -6,7 +6,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
@@ -15,6 +17,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -23,92 +28,60 @@ jobs:
           deno-version: v2.x
 
       - name: Clean build directories
-        run: rm -rf .next out
+        run: rm -rf .next out _site
 
       - run: deno install --allow-scripts
       - run: deno task build
 
-      - name: Copy build output to repository root
+      - name: Prepare site for GitHub Pages
         run: |
+          mkdir -p _site
+
           find out -mindepth 1 -maxdepth 1 | while read -r item; do
             name=$(basename "$item")
             case "$name" in
               __next.*) continue ;;
             esac
-            rm -rf "$name"
-            cp -r "$item" "./$name"
+            cp -r "$item" "_site/$name"
           done
 
-      - name: Rename Jekyll-incompatible paths
-        run: |
-          if [ -d _next ]; then
-            rm -rf assets
-            mv _next assets
+          if [ -d _site/_next ]; then
+            mv _site/_next _site/assets
           fi
-          if [ -d _not-found ]; then
-            rm -rf not-found
-            mv _not-found not-found
+          if [ -d _site/_not-found ]; then
+            mv _site/_not-found _site/not-found
           fi
 
-      - name: Rewrite asset paths in deployed files
-        run: |
           rewrite() {
             find "$1" -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' \) \
               -exec sed -i 's|/_next/|/assets/|g; s|/_not-found/|/not-found/|g' {} +
           }
-          # 固定のターゲットを書き換え（assets/はリネーム後の_next/、not-foundは_not-found/）
+
           for target in index.html 404.html assets not-found 404; do
-            if [ -e "$target" ]; then
-              if [ -f "$target" ]; then
-                sed -i 's|/_next/|/assets/|g; s|/_not-found/|/not-found/|g' "$target"
+            if [ -e "_site/$target" ]; then
+              if [ -f "_site/$target" ]; then
+                sed -i 's|/_next/|/assets/|g; s|/_not-found/|/not-found/|g' "_site/$target"
               else
-                rewrite "$target"
+                rewrite "_site/$target"
               fi
             fi
           done
-          # out/ に含まれる追加のページディレクトリを書き換え
+
           find out -mindepth 1 -maxdepth 1 -type d | while read -r dir; do
             name=$(basename "$dir")
             case "$name" in
               _next|_not-found|404) ;;
-              *) [ -d "$name" ] && rewrite "$name" ;;
+              *) [ -d "_site/$name" ] && rewrite "_site/$name" ;;
             esac
           done
-          touch .nojekyll
 
-      - name: Commit and push site files
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          touch _site/.nojekyll
 
-          # out/ を削除する前にページディレクトリ一覧を取得する
-          page_dirs=$(find out -mindepth 1 -maxdepth 1 -type d 2>/dev/null | while read -r dir; do
-            name=$(basename "$dir")
-            case "$name" in
-              _next|_not-found|__next.*) ;;
-              *) echo "$name" ;;
-            esac
-          done)
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
 
-          # Drop stale build artifacts so old chunk files are not left behind.
-          git rm -rf --cached out _next _not-found assets 2>/dev/null || true
-          git rm -rf --cached \
-            __next.__PAGE__.txt __next._full.txt __next._head.txt __next._index.txt __next._tree.txt \
-            index.txt 2>/dev/null || true
-          rm -rf out _next _not-found
-
-          git add -f .nojekyll
-          for path in index.html 404.html assets not-found 404 favicon.ico favicon.svg apple-touch-icon.png icon.svg web-app-manifest-192x192.png web-app-manifest-512x512.png; do
-            [ -e "$path" ] && git add -f -A "$path"
-          done
-          echo "$page_dirs" | while read -r name; do
-            [ -n "$name" ] && [ -d "$name" ] && git add -f -A "$name"
-          done
-
-          if git diff --staged --quiet; then
-            echo "No site changes to deploy"
-            exit 0
-          fi
-
-          git commit -m "Deploy site to GitHub Pages root [skip ci]"
-          git push
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
