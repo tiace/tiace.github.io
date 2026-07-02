@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { AppWindow, Clock, ListChecks, Play, Settings, X } from "lucide-react"
+import { AppWindow, Clock, ListChecks, Play, Repeat2, Settings, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useIsDesktop } from "@/hooks/use-is-desktop"
 import { type CurrentTask, type Screen, formatDuration } from "@/lib/toprio"
@@ -70,6 +70,7 @@ export function AppDrawer({
     },
     { screen: "manage", label: "To-dos", icon: <ListChecks className="size-4" aria-hidden="true" /> },
     { screen: "history", label: "History", icon: <Clock className="size-4" aria-hidden="true" /> },
+    { screen: "routines", label: "Routines", icon: <Repeat2 className="size-4" aria-hidden="true" /> },
   ]
 
   if (!open) return null
@@ -87,7 +88,7 @@ export function AppDrawer({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="ナビゲーションメニュー"
+        aria-label="Navigation menu"
         className="relative flex h-full w-72 max-w-[80vw] flex-col border-l border-border bg-card shadow-xl animate-in slide-in-from-right duration-200"
       >
         {/* ヘッダー */}
@@ -99,7 +100,7 @@ export function AppDrawer({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            aria-label="メニューを閉じる"
+            aria-label="Close menu"
             className="size-8 rounded-lg"
             autoFocus
           >

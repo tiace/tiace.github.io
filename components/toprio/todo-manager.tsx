@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { ArrowLeft, Clock, GripVertical, Plus, Trash2 } from "lucide-react"
+import { ArrowLeft, Clock, GripVertical, Plus, Repeat2, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Todo } from "@/lib/toprio"
 
@@ -28,6 +28,7 @@ type TodoManagerProps = {
   onRename: (id: string, name: string) => void
   onBack: () => void
   onHistory: () => void
+  onOpenRoutineDialog: () => void
 }
 
 type SortableTodoItemProps = {
@@ -75,7 +76,7 @@ function SortableTodoItem({ todo, index, onRemove, onRename }: SortableTodoItemP
         {...attributes}
         {...listeners}
         className="flex cursor-grab touch-none items-center gap-3 active:cursor-grabbing"
-        aria-label={`${todo.name}をドラッグして並び替え`}
+        aria-label={`Drag to reorder ${todo.name}`}
       >
         <GripVertical className="size-4 shrink-0 text-muted-foreground/40" aria-hidden="true" />
         <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
@@ -104,7 +105,7 @@ function SortableTodoItem({ todo, index, onRemove, onRename }: SortableTodoItemP
         size="icon"
         className="size-8 shrink-0 rounded-lg text-muted-foreground hover:text-destructive"
         onClick={() => onRemove(todo.id)}
-        aria-label={`${todo.name}を削除`}
+        aria-label={`Remove ${todo.name}`}
       >
         <Trash2 className="size-4" aria-hidden="true" />
       </Button>
@@ -120,6 +121,7 @@ export function TodoManager({
   onRename,
   onBack,
   onHistory,
+  onOpenRoutineDialog,
 }: TodoManagerProps) {
   const [value, setValue] = useState("")
 
@@ -167,19 +169,30 @@ export function TodoManager({
         </p>
       </div>
 
-      <form onSubmit={handleAdd} className="flex items-center gap-2">
-        <input
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="Add a task"
-          aria-label="New task name"
-          className="h-11 w-full rounded-xl border border-border bg-card px-4 text-card-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/40"
-        />
-        <Button type="submit" disabled={!value.trim()} className="h-11 rounded-xl">
-          <Plus className="size-4" aria-hidden="true" />
-          <span className="sr-only sm:not-sr-only">Add</span>
+      <div className="flex flex-col gap-2">
+        <form onSubmit={handleAdd} className="flex items-center gap-2">
+          <input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Add a task"
+            aria-label="New task name"
+            className="h-11 w-full rounded-xl border border-border bg-card px-4 text-card-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/40"
+          />
+          <Button type="submit" disabled={!value.trim()} className="h-11 rounded-xl">
+            <Plus className="size-4" aria-hidden="true" />
+            <span className="sr-only sm:not-sr-only">Add</span>
+          </Button>
+        </form>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onOpenRoutineDialog}
+          className="self-start rounded-xl"
+        >
+          <Repeat2 className="size-4" aria-hidden="true" />
+          + Routine
         </Button>
-      </form>
+      </div>
 
       {todos.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border px-5 py-10 text-center text-sm text-muted-foreground">

@@ -10,9 +10,12 @@ import { FinishedScreen } from "@/components/toprio/finished-screen"
 import { TodoManager } from "@/components/toprio/todo-manager"
 import { HistoryScreen } from "@/components/toprio/history-screen"
 import { OptionsScreen } from "@/components/toprio/options-screen"
+import { RoutinesScreen } from "@/components/toprio/routines-screen"
+import { RoutineApplyDialog } from "@/components/toprio/routine-apply-dialog"
 import { DrawerButton } from "@/components/toprio/drawer-button"
 import { AppDrawer } from "@/components/toprio/app-drawer"
 import { openSmallWindow } from "@/lib/small-window"
+import { useRoutines } from "@/hooks/use-routines"
 
 type ToprioAppProps = {
   initialScreen?: Screen
@@ -32,12 +35,25 @@ export function ToprioApp({
     startNextTodo,
     finishCurrent,
     addTodo,
+    addTodos,
     removeTodo,
     moveTodo,
     renameTodo,
     renameCurrentTask,
     reorderTodos,
   } = useToprio()
+
+  const {
+    state: routinesState,
+    createRoutine,
+    renameRoutine,
+    deleteRoutine,
+    addRoutineTask,
+    removeRoutineTask,
+    reorderRoutineTasks,
+    renameRoutineTask,
+    getTasksForRoutine,
+  } = useRoutines()
   const {
     options,
     hydrated: optionsHydrated,
@@ -55,6 +71,8 @@ export function ToprioApp({
   const [finishedVariant, setFinishedVariant] = useState<"finished" | "ready">(
     initialFinishedVariant ?? "finished",
   )
+  const [routineDialogOpen, setRoutineDialogOpen] = useState(false)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (!hydrated || initialScreen) return
@@ -70,6 +88,19 @@ export function ToprioApp({
   useEffect(() => {
     document.title = state.current ? `${state.current.name} - Toprio` : "Toprio"
   }, [state.current])
+
+  useEffect(() => {
+    if (!toastMessage) return
+    const timer = setTimeout(() => setToastMessage(null), 3000)
+    return () => clearTimeout(timer)
+  }, [toastMessage])
+
+  function handleApplyRoutine(routineId: string) {
+    const tasks = getTasksForRoutine(routineId)
+    addTodos(tasks.map((t) => t.title))
+    setRoutineDialogOpen(false)
+    setToastMessage(`${tasks.length} task${tasks.length !== 1 ? "s" : ""} added`)
+  }
 
   function handleStartTask(name: string) {
     startTask(name)
@@ -151,6 +182,24 @@ export function ToprioApp({
           onRename={renameTodo}
           onBack={() => setScreen(state.current ? "focus" : "finished")}
           onHistory={() => openHistory("manage")}
+          onOpenRoutineDialog={() => setRoutineDialogOpen(true)}
+        />
+      )
+    }
+
+    if (screen === "routines") {
+      return (
+        <RoutinesScreen
+          routines={routinesState.routines}
+          getTasksForRoutine={getTasksForRoutine}
+          onBack={() => setScreen(state.current ? "focus" : "finished")}
+          onCreateRoutine={createRoutine}
+          onRenameRoutine={renameRoutine}
+          onDeleteRoutine={deleteRoutine}
+          onAddRoutineTask={addRoutineTask}
+          onRemoveRoutineTask={removeRoutineTask}
+          onReorderRoutineTasks={reorderRoutineTasks}
+          onRenameRoutineTask={renameRoutineTask}
         />
       )
     }
@@ -199,6 +248,23 @@ export function ToprioApp({
         onNavigate={handleDrawerNavigate}
         onOpenSmallWindow={handleOpenSmallWindow}
       />
+      {routineDialogOpen && (
+        <RoutineApplyDialog
+          routines={routinesState.routines}
+          getTasksForRoutine={getTasksForRoutine}
+          onApply={handleApplyRoutine}
+          onClose={() => setRoutineDialogOpen(false)}
+        />
+      )}
+      {toastMessage && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background shadow-lg animate-in fade-in duration-200"
+        >
+          {toastMessage}
+        </div>
+      )}
     </>
   )
 }

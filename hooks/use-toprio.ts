@@ -95,6 +95,15 @@ export function useToprio() {
     }))
   }, [])
 
+  const addTodos = useCallback((names: string[]) => {
+    const trimmed = names.map((n) => n.trim()).filter(Boolean)
+    if (trimmed.length === 0) return
+    setState((s) => ({
+      ...s,
+      todos: [...s.todos, ...trimmed.map((name) => ({ id: createId(), name }))],
+    }))
+  }, [])
+
   const removeTodo = useCallback((id: string) => {
     setState((s) => ({ ...s, todos: s.todos.filter((t) => t.id !== id) }))
   }, [])
@@ -141,6 +150,7 @@ export function useToprio() {
     startNextTodo,
     finishCurrent,
     addTodo,
+    addTodos,
     removeTodo,
     moveTodo,
     renameTodo,

@@ -1,4 +1,4 @@
-export type Screen = "start" | "focus" | "finished" | "manage" | "history" | "options"
+export type Screen = "start" | "focus" | "finished" | "manage" | "history" | "options" | "routines"
 
 export type HourFormat = "12" | "24"
 
