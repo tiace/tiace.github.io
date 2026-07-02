@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import {
   BACKGROUND_COLORS,
   CARD_COLORS,
+  getColorValue,
   type HourFormat,
   type OptionsState,
 } from "@/lib/options"
@@ -75,16 +76,19 @@ function ColorSwatches({
   selectedId,
   onSelect,
   groupLabel,
+  darkMode,
 }: {
   colors: typeof BACKGROUND_COLORS
   selectedId: string
   onSelect: (id: string) => void
   groupLabel: string
+  darkMode: boolean
 }) {
   return (
     <div className="flex flex-wrap gap-2">
       {colors.map((color) => {
         const selected = color.id === selectedId
+        const swatchColor = getColorValue(colors, color.id, darkMode) ?? color.light
         return (
           <button
             key={color.id}
@@ -97,7 +101,7 @@ function ColorSwatches({
               "size-9 rounded-full border-2 transition-transform hover:scale-105",
               selected ? "border-primary ring-2 ring-primary/30" : "border-border",
             ].join(" ")}
-            style={{ backgroundColor: color.value }}
+            style={{ backgroundColor: swatchColor }}
           />
         )
       })}
@@ -187,18 +191,11 @@ export function OptionsScreen({
         <div>
           <h2 className="text-sm font-medium text-foreground">Color</h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {options.darkMode
-              ? "Color options apply in light mode."
-              : "Pick background and card colors."}
+            Pick background and card colors. Swatches match the current mode.
           </p>
         </div>
 
-        <div
-          className={[
-            "flex flex-col gap-4 rounded-xl border border-border bg-card px-4 py-4",
-            options.darkMode ? "opacity-50" : "",
-          ].join(" ")}
-        >
+        <div className="flex flex-col gap-4 rounded-xl border border-border bg-card px-4 py-4">
           <div className="flex flex-col gap-2">
             <span className="text-sm font-medium text-card-foreground">Background</span>
             <ColorSwatches
@@ -206,6 +203,7 @@ export function OptionsScreen({
               selectedId={options.backgroundColor}
               onSelect={onBackgroundColorChange}
               groupLabel="Background"
+              darkMode={options.darkMode}
             />
           </div>
 
@@ -216,6 +214,7 @@ export function OptionsScreen({
               selectedId={options.cardColor}
               onSelect={onCardColorChange}
               groupLabel="Card"
+              darkMode={options.darkMode}
             />
           </div>
         </div>
