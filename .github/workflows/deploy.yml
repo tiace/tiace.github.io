@@ -56,15 +56,21 @@ jobs:
             find "$1" -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' \) \
               -exec sed -i 's|/_next/|/assets/|g; s|/_not-found/|/not-found/|g' {} +
           }
-          # ルートの html ファイルを書き換え
-          for target in index.html 404.html; do
-            [ -f "$target" ] && sed -i 's|/_next/|/assets/|g; s|/_not-found/|/not-found/|g' "$target"
+          # 固定のターゲットを書き換え（assets/はリネーム後の_next/、not-foundは_not-found/）
+          for target in index.html 404.html assets not-found 404; do
+            if [ -e "$target" ]; then
+              if [ -f "$target" ]; then
+                sed -i 's|/_next/|/assets/|g; s|/_not-found/|/not-found/|g' "$target"
+              else
+                rewrite "$target"
+              fi
+            fi
           done
-          # out/ に含まれるすべてのサブディレクトリを書き換え対象にする
+          # out/ に含まれる追加のページディレクトリを書き換え
           find out -mindepth 1 -maxdepth 1 -type d | while read -r dir; do
             name=$(basename "$dir")
             case "$name" in
-              _next|_not-found) ;;
+              _next|_not-found|404) ;;
               *) [ -d "$name" ] && rewrite "$name" ;;
             esac
           done
@@ -75,6 +81,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # out/ を削除する前にページディレクトリ一覧を取得する
+          page_dirs=$(find out -mindepth 1 -maxdepth 1 -type d 2>/dev/null | while read -r dir; do
+            name=$(basename "$dir")
+            case "$name" in
+              _next|_not-found|__next.*) ;;
+              *) echo "$name" ;;
+            esac
+          done)
+
           # Drop stale build artifacts so old chunk files are not left behind.
           git rm -rf --cached out _next _not-found assets 2>/dev/null || true
           git rm -rf --cached \
@@ -83,16 +98,11 @@ jobs:
           rm -rf out _next _not-found
 
           git add -f .nojekyll
-          # out/ に含まれたすべてのページディレクトリを動的に追加
           for path in index.html 404.html assets not-found 404 favicon.ico favicon.svg apple-touch-icon.png icon.svg web-app-manifest-192x192.png web-app-manifest-512x512.png; do
             [ -e "$path" ] && git add -f -A "$path"
           done
-          find out -mindepth 1 -maxdepth 1 -type d | while read -r dir; do
-            name=$(basename "$dir")
-            case "$name" in
-              _next|_not-found|__next.*) ;;
-              *) [ -d "$name" ] && git add -f -A "$name" ;;
-            esac
+          echo "$page_dirs" | while read -r name; do
+            [ -n "$name" ] && [ -d "$name" ] && git add -f -A "$name"
           done
 
           if git diff --staged --quiet; then
