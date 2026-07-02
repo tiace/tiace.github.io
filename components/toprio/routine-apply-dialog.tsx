@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { X } from "lucide-react"
+import { ArrowRight, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Routine, RoutineTask } from "@/lib/routine"
 
@@ -10,6 +10,7 @@ type RoutineApplyDialogProps = {
   getTasksForRoutine: (routineId: string) => RoutineTask[]
   onApply: (routineId: string) => void
   onClose: () => void
+  onGoToRoutines: () => void
 }
 
 export function RoutineApplyDialog({
@@ -17,6 +18,7 @@ export function RoutineApplyDialog({
   getTasksForRoutine,
   onApply,
   onClose,
+  onGoToRoutines,
 }: RoutineApplyDialogProps) {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -53,9 +55,23 @@ export function RoutineApplyDialog({
         </div>
 
         {routines.length === 0 ? (
-          <p className="px-4 pb-8 text-sm text-muted-foreground">
-            No routines yet.
-          </p>
+          <div className="flex flex-col gap-4 px-4 pb-6">
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-medium text-foreground">No routines yet.</p>
+              <p className="text-sm text-muted-foreground">
+                Routines are saved task sets you can add all at once.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="self-start rounded-xl"
+              onClick={onGoToRoutines}
+            >
+              Create a routine
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Button>
+          </div>
         ) : (
           <ul className="flex flex-col gap-1 px-2 pb-4">
             {routines.map((routine) => {

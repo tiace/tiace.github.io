@@ -67,6 +67,7 @@ export function ToprioApp({
   const [screen, setScreen] = useState<Screen>(initialScreen ?? "start")
   const [historyOrigin, setHistoryOrigin] = useState<Screen>(initialHistoryOrigin ?? "finished")
   const [optionsOrigin, setOptionsOrigin] = useState<Screen>("start")
+  const [routinesOrigin, setRoutinesOrigin] = useState<Screen>("manage")
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [finishedVariant, setFinishedVariant] = useState<"finished" | "ready">(
     initialFinishedVariant ?? "finished",
@@ -137,6 +138,11 @@ export function ToprioApp({
       setScreen("options")
       return
     }
+    if (target === "routines") {
+      setRoutinesOrigin(screen)
+      setScreen("routines")
+      return
+    }
     setScreen(target)
   }
 
@@ -192,7 +198,7 @@ export function ToprioApp({
         <RoutinesScreen
           routines={routinesState.routines}
           getTasksForRoutine={getTasksForRoutine}
-          onBack={() => setScreen(state.current ? "focus" : "finished")}
+          onBack={() => setScreen(routinesOrigin)}
           onCreateRoutine={createRoutine}
           onRenameRoutine={renameRoutine}
           onDeleteRoutine={deleteRoutine}
@@ -254,6 +260,11 @@ export function ToprioApp({
           getTasksForRoutine={getTasksForRoutine}
           onApply={handleApplyRoutine}
           onClose={() => setRoutineDialogOpen(false)}
+          onGoToRoutines={() => {
+            setRoutineDialogOpen(false)
+            setRoutinesOrigin("manage")
+            setScreen("routines")
+          }}
         />
       )}
       {toastMessage && (
