@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Check } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,7 @@ type FocusScreenProps = {
   task: CurrentTask
   onFinish: () => void
   onCapture: (note: string) => void
+  onRename: (name: string) => void
   notificationsEnabled?: boolean
 }
 
@@ -17,10 +18,14 @@ export function FocusScreen({
   task,
   onFinish,
   onCapture,
+  onRename,
   notificationsEnabled = true,
 }: FocusScreenProps) {
   const [now, setNow] = useState(() => Date.now())
   const [note, setNote] = useState("")
+  const [editing, setEditing] = useState(false)
+  const [editValue, setEditValue] = useState(task.name)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000)
@@ -28,6 +33,27 @@ export function FocusScreen({
   }, [])
 
   const elapsed = Math.max(0, now - task.startedAt)
+
+  function startEditing() {
+    setEditValue(task.name)
+    setEditing(true)
+    setTimeout(() => inputRef.current?.select(), 0)
+  }
+
+  function commitEdit() {
+    const trimmed = editValue.trim()
+    if (trimmed && trimmed !== task.name) onRename(trimmed)
+    else setEditValue(task.name)
+    setEditing(false)
+  }
+
+  function handleEditKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") commitEdit()
+    if (e.key === "Escape") {
+      setEditValue(task.name)
+      setEditing(false)
+    }
+  }
 
   function handleCapture(event: React.FormEvent) {
     event.preventDefault()
@@ -49,9 +75,23 @@ export function FocusScreen({
         <span className="text-xs font-medium uppercase tracking-[0.3em] text-sticky-foreground/70">
           Now
         </span>
-        <h1 className="text-balance text-3xl font-semibold leading-tight text-sticky-foreground sm:text-5xl">
-          {task.name}
-        </h1>
+        {editing ? (
+          <input
+            ref={inputRef}
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={commitEdit}
+            onKeyDown={handleEditKeyDown}
+            className="w-full bg-transparent text-center text-3xl font-semibold leading-tight text-sticky-foreground outline-none sm:text-5xl"
+          />
+        ) : (
+          <h1
+            className="text-balance text-3xl font-semibold leading-tight text-sticky-foreground sm:text-5xl cursor-text"
+            onClick={startEditing}
+          >
+            {task.name}
+          </h1>
+        )}
         <p
           className="font-mono text-2xl tabular-nums text-sticky-foreground/80 sm:text-3xl"
           aria-label="Elapsed time"

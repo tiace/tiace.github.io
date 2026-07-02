@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef, useState } from "react"
 import { ArrowRight, Clock, ListChecks, PartyPopper, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TaskInput } from "@/components/toprio/task-input"
@@ -11,6 +12,7 @@ type FinishedScreenProps = {
   onStartNew: (name: string) => void
   onManage: () => void
   onHistory: () => void
+  onRenameNext: (id: string, name: string) => void
   variant?: "finished" | "ready"
 }
 
@@ -20,10 +22,36 @@ export function FinishedScreen({
   onStartNew,
   onManage,
   onHistory,
+  onRenameNext,
   variant = "finished",
 }: FinishedScreenProps) {
   const next = todos[0]
   const isReady = variant === "ready"
+  const [editing, setEditing] = useState(false)
+  const [editValue, setEditValue] = useState("")
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  function startEditing() {
+    if (!next) return
+    setEditValue(next.name)
+    setEditing(true)
+    setTimeout(() => inputRef.current?.select(), 0)
+  }
+
+  function commitEdit() {
+    if (!next) return
+    const trimmed = editValue.trim()
+    if (trimmed && trimmed !== next.name) onRenameNext(next.id, trimmed)
+    else setEditValue(next.name)
+    setEditing(false)
+  }
+
+  function handleEditKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") commitEdit()
+    if (e.key === "Escape") {
+      setEditing(false)
+    }
+  }
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-10 px-6 py-16">
@@ -53,9 +81,23 @@ export function FinishedScreen({
             <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
               Next up
             </span>
-            <span className="text-lg font-medium text-card-foreground">
-              {next.name}
-            </span>
+            {editing ? (
+              <input
+                ref={inputRef}
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onBlur={commitEdit}
+                onKeyDown={handleEditKeyDown}
+                className="bg-transparent text-center text-lg font-medium text-card-foreground outline-none"
+              />
+            ) : (
+              <span
+                className="cursor-text text-lg font-medium text-card-foreground"
+                onClick={startEditing}
+              >
+                {next.name}
+              </span>
+            )}
           </div>
           <Button
             onClick={onStartNext}

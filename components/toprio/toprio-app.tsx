@@ -35,6 +35,7 @@ export function ToprioApp({
     removeTodo,
     moveTodo,
     renameTodo,
+    renameCurrentTask,
     reorderTodos,
   } = useToprio()
   const {
@@ -119,6 +120,7 @@ export function ToprioApp({
           task={state.current}
           onFinish={handleFinish}
           onCapture={addTodo}
+          onRename={renameCurrentTask}
           notificationsEnabled={options.notifications}
         />
       )
@@ -132,6 +134,7 @@ export function ToprioApp({
           onStartNew={handleStartTask}
           onManage={() => setScreen("manage")}
           onHistory={() => openHistory("finished")}
+          onRenameNext={renameTodo}
           variant={finishedVariant}
         />
       )

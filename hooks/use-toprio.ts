@@ -119,6 +119,12 @@ export function useToprio() {
     }))
   }, [])
 
+  const renameCurrentTask = useCallback((name: string) => {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    setState((s) => (s.current ? { ...s, current: { ...s.current, name: trimmed } } : s))
+  }, [])
+
   const reorderTodos = useCallback((fromIndex: number, toIndex: number) => {
     setState((s) => {
       const todos = [...s.todos]
@@ -138,6 +144,7 @@ export function useToprio() {
     removeTodo,
     moveTodo,
     renameTodo,
+    renameCurrentTask,
     reorderTodos,
   }
 }
