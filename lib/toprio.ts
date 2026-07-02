@@ -1,4 +1,6 @@
-export type Screen = "start" | "focus" | "finished" | "manage" | "history"
+export type Screen = "start" | "focus" | "finished" | "manage" | "history" | "options"
+
+export type HourFormat = "12" | "24"
 
 export type Todo = {
   id: string
@@ -77,19 +79,21 @@ export function formatDuration(ms: number): string {
   return `${pad(minutes)}:${pad(seconds)}`
 }
 
-export function formatClock(epochMs: number): string {
+export function formatClock(epochMs: number, hourFormat: HourFormat = "24"): string {
   return new Date(epochMs).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: hourFormat === "12",
   })
 }
 
-export function formatDateTime(epochMs: number): string {
+export function formatDateTime(epochMs: number, hourFormat: HourFormat = "24"): string {
   return new Date(epochMs).toLocaleString([], {
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    hour12: hourFormat === "12",
   })
 }
 

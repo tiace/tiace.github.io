@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
+  colorScheme: 'light dark',
   themeColor: '#F7F5F2',
 }
 
@@ -35,10 +35,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} light bg-background`}
-    >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} light bg-background`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var o=JSON.parse(localStorage.getItem("toprio:options:v1")||"{}");var r=document.documentElement;if(o.darkMode){r.classList.remove("light");r.classList.add("dark");}else{r.classList.remove("dark");r.classList.add("light");}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="font-sans antialiased">
         {children}
         <Toaster position="bottom-right" />

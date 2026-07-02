@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   type HistoryEntry,
+  type HourFormat,
   formatClock,
   formatDateTime,
   formatDurationLong,
@@ -11,10 +12,11 @@ import {
 
 type HistoryScreenProps = {
   history: HistoryEntry[]
+  hourFormat?: HourFormat
   onBack: () => void
 }
 
-export function HistoryScreen({ history, onBack }: HistoryScreenProps) {
+export function HistoryScreen({ history, hourFormat = "24", onBack }: HistoryScreenProps) {
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-xl flex-col gap-6 px-6 py-12">
       <div className="flex items-center justify-between">
@@ -47,9 +49,10 @@ export function HistoryScreen({ history, onBack }: HistoryScreenProps) {
                   {entry.name}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {formatDateTime(entry.startedAt)} &middot; {formatClock(entry.startedAt)}
+                  {formatDateTime(entry.startedAt, hourFormat)} &middot;{" "}
+                  {formatClock(entry.startedAt, hourFormat)}
                   {" – "}
-                  {formatClock(entry.endedAt)}
+                  {formatClock(entry.endedAt, hourFormat)}
                 </span>
               </div>
               <span className="shrink-0 rounded-full bg-muted px-3 py-1 font-mono text-xs tabular-nums text-muted-foreground">

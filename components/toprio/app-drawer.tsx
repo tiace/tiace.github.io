@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { AppWindow, Clock, ListChecks, Play, X } from "lucide-react"
+import { AppWindow, Clock, ListChecks, Play, Settings, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useIsDesktop } from "@/hooks/use-is-desktop"
 import { type CurrentTask, type Screen, formatDuration } from "@/lib/toprio"
@@ -138,17 +138,33 @@ export function AppDrawer({
             </ul>
           </nav>
 
-          {isDesktop && (
-            <div className="mt-2 border-t border-border pt-4">
+          <div className="mt-2 border-t border-border pt-4">
+            <button
+              onClick={() => {
+                onNavigate("options")
+                onClose()
+              }}
+              className={[
+                "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                screen === "options"
+                  ? "bg-muted text-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              ].join(" ")}
+            >
+              <Settings className="size-4" aria-hidden="true" />
+              Options
+            </button>
+
+            {isDesktop && (
               <button
                 onClick={onOpenSmallWindow}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <AppWindow className="size-4" aria-hidden="true" />
                 Small Window
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

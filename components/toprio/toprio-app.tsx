@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useOptions } from "@/hooks/use-options"
 import { useToprio } from "@/hooks/use-toprio"
 import { type Screen } from "@/lib/toprio"
 import { StartScreen } from "@/components/toprio/start-screen"
@@ -8,6 +9,7 @@ import { FocusScreen } from "@/components/toprio/focus-screen"
 import { FinishedScreen } from "@/components/toprio/finished-screen"
 import { TodoManager } from "@/components/toprio/todo-manager"
 import { HistoryScreen } from "@/components/toprio/history-screen"
+import { OptionsScreen } from "@/components/toprio/options-screen"
 import { DrawerButton } from "@/components/toprio/drawer-button"
 import { AppDrawer } from "@/components/toprio/app-drawer"
 import { openSmallWindow } from "@/lib/small-window"
@@ -35,9 +37,19 @@ export function ToprioApp({
     renameTodo,
     reorderTodos,
   } = useToprio()
+  const {
+    options,
+    hydrated: optionsHydrated,
+    setDarkMode,
+    setNotifications,
+    setBackgroundColor,
+    setCardColor,
+    setHourFormat,
+  } = useOptions()
 
   const [screen, setScreen] = useState<Screen>(initialScreen ?? "start")
   const [historyOrigin, setHistoryOrigin] = useState<Screen>(initialHistoryOrigin ?? "finished")
+  const [optionsOrigin, setOptionsOrigin] = useState<Screen>("start")
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [finishedVariant, setFinishedVariant] = useState<"finished" | "ready">(
     initialFinishedVariant ?? "finished",
@@ -88,10 +100,15 @@ export function ToprioApp({
       setScreen("history")
       return
     }
+    if (target === "options") {
+      setOptionsOrigin(screen)
+      setScreen("options")
+      return
+    }
     setScreen(target)
   }
 
-  if (!hydrated) {
+  if (!hydrated || !optionsHydrated) {
     return <div className="min-h-svh bg-background" aria-hidden="true" />
   }
 
@@ -102,6 +119,7 @@ export function ToprioApp({
           task={state.current}
           onFinish={handleFinish}
           onCapture={addTodo}
+          notificationsEnabled={options.notifications}
         />
       )
     }
@@ -138,7 +156,22 @@ export function ToprioApp({
       return (
         <HistoryScreen
           history={state.history}
+          hourFormat={options.hourFormat}
           onBack={() => setScreen(historyOrigin)}
+        />
+      )
+    }
+
+    if (screen === "options") {
+      return (
+        <OptionsScreen
+          options={options}
+          onBack={() => setScreen(optionsOrigin)}
+          onDarkModeChange={setDarkMode}
+          onNotificationsChange={setNotifications}
+          onBackgroundColorChange={setBackgroundColor}
+          onCardColorChange={setCardColor}
+          onHourFormatChange={setHourFormat}
         />
       )
     }

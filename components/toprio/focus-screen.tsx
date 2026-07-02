@@ -10,9 +10,15 @@ type FocusScreenProps = {
   task: CurrentTask
   onFinish: () => void
   onCapture: (note: string) => void
+  notificationsEnabled?: boolean
 }
 
-export function FocusScreen({ task, onFinish, onCapture }: FocusScreenProps) {
+export function FocusScreen({
+  task,
+  onFinish,
+  onCapture,
+  notificationsEnabled = true,
+}: FocusScreenProps) {
   const [now, setNow] = useState(() => Date.now())
   const [note, setNote] = useState("")
 
@@ -29,7 +35,9 @@ export function FocusScreen({ task, onFinish, onCapture }: FocusScreenProps) {
     if (!trimmed) return
     onCapture(trimmed)
     setNote("")
-    toast.success(`I'll remind you later: "${trimmed}"`)
+    if (notificationsEnabled) {
+      toast.success(`I'll remind you later: "${trimmed}"`)
+    }
   }
 
   return (

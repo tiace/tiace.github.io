@@ -8,7 +8,14 @@ export type SmallWindowParams = {
   finishedVariant?: "finished" | "ready"
 }
 
-const VALID_SCREENS = new Set<Screen>(["start", "focus", "finished", "manage", "history"])
+const VALID_SCREENS = new Set<Screen>([
+  "start",
+  "focus",
+  "finished",
+  "manage",
+  "history",
+  "options",
+])
 
 export function parseSmallWindowParams(searchParams: URLSearchParams): SmallWindowParams | null {
   const screen = searchParams.get("screen")
